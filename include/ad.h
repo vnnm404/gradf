@@ -1,6 +1,8 @@
 #ifndef AD_H
 #define AD_H
 
+#include <stdbool.h>
+
 enum ad_op {
     AD_OP_ADD,
     AD_OP_SUBTRACT,
@@ -15,6 +17,7 @@ typedef struct ad_float {
     struct ad_float* factor_a;
     struct ad_float* factor_b;
     enum ad_op op;
+    bool visited;
 } ad_float;
 
 ad_float* __ad_make(
@@ -34,8 +37,17 @@ ad_float* __ad_multiply(ad_float* a, ad_float* b);
 ad_float* __ad_multiply_float(ad_float* a, float b);
 ad_float* __ad_divide(ad_float* a, ad_float* b);
 
-ad_float* gradf(const char *format, ...);
+ad_float* gradf(const char* format, ...);
 int zero_grad(ad_float* y);
 int backward(ad_float* y);
+int free_graph(ad_float* y);
+
+typedef struct __stack __stack;
+
+__stack* __ad_stack();
+int __ad_is_stack_empty(__stack* s);
+void __ad_push(__stack* s, ad_float* data);
+ad_float* __ad_pop(__stack* s);
+void __ad_free_stack(__stack* s);
 
 #endif // AD_H

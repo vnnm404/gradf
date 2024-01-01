@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "ad.h"
 
@@ -16,6 +17,7 @@ ad_float* __ad_make(
     x->factor_a = factor_a;
     x->factor_b = factor_b;
     x->op = op;
+    x->visited = false;
 
     return x;
 }
@@ -29,12 +31,13 @@ int zero_grad(ad_float* y) {
     if (y == NULL) return 0;
     
     y->grad = 0;
+    y->visited = false;
     if (y->factor_a) zero_grad(y->factor_a);
     if (y->factor_b) zero_grad(y->factor_b);
     return 0;
 }
 
-int __backward_core(ad_float* y) {
+int __ad_update(ad_float* y) {
     if (y->factor_a == NULL || y->factor_b == NULL) return 0;
 
     float grad = y->grad;
@@ -71,18 +74,53 @@ int __backward_core(ad_float* y) {
             break;
         }
     }
-
-    __backward_core(y->factor_a);
-    __backward_core(y->factor_b);
-
     return 0;
+}
+
+void __ad_dfs(ad_float* y, __stack* s) {
+    if (y == NULL || y->visited) return;
+
+    y->visited = true;
+
+    __ad_dfs(y->factor_a, s);
+    __ad_dfs(y->factor_b, s);
+
+    __ad_push(s, y);
 }
 
 int backward(ad_float* y) {
     if (y == NULL) return 0;
 
-    zero_grad(y);
+    __stack* s = __ad_stack();
 
+    zero_grad(y);
     y->grad = 1;
-    return __backward_core(y);
+
+    __ad_dfs(y, s);
+
+    while (!__ad_is_stack_empty(s)) {
+        ad_float* x = __ad_pop(s);
+        __ad_update(x);
+    }
+
+    __ad_free_stack(s);
+    return 0;
+}
+
+int free_graph(ad_float* y) {
+    if (y == NULL) return 0;
+
+    __stack* s = __ad_stack();
+
+    zero_grad(y);
+    __ad_dfs(y, s);
+
+    while (!__ad_is_stack_empty(s)) {
+        ad_float* x = __ad_pop(s);
+        free(x);
+    }
+
+    __ad_free_stack(s);
+
+    return 0;
 }
