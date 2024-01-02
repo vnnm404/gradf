@@ -14,4 +14,16 @@ int main() {
     printf("grad: %f %f %f %f\n", a->grad, b->grad, c->grad, d->grad);
 
     free_graph(d);
+
+    a = ad(1);
+    b = __ad_add_float(a, 3);
+    c = __ad_multiply_float(b, 4);
+    d = __ad_multiply(c, c);
+
+    backward(d);
+
+    printf("data: %f %f %f %f\n", a->data, b->data, c->data, d->data);
+    printf("grad: %f %f %f %f\n", a->grad, b->grad, c->grad, d->grad);
+
+    free_graph(d);
 }

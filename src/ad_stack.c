@@ -2,17 +2,6 @@
 #include <stdlib.h>
 #include "ad.h"
 
-typedef struct __node {
-    ad_float* data;
-    struct __node* next;
-} __node;
-
-typedef struct __stack {
-    __node* top;
-    int size;
-    int maxSize;
-} __stack;
-
 __stack* __ad_stack() {
     __stack* s = (__stack*)malloc(sizeof(__stack));
     s->top = NULL;
@@ -32,6 +21,15 @@ void __ad_push(__stack* s, ad_float* data) {
     s->size++;
 }
 
+void __ad_push_op(__stack* s, enum ad_op op) {
+    __node* node = (__node*)malloc(sizeof(__node));
+    node->data = NULL;
+    node->op = op;
+    node->next = s->top;
+    s->top = node;
+    s->size++;
+}
+
 ad_float* __ad_pop(__stack* s) {
     if (__ad_is_stack_empty(s)) {
         return NULL;
@@ -39,6 +37,20 @@ ad_float* __ad_pop(__stack* s) {
 
     __node* temp = s->top;
     ad_float* data = temp->data;
+    s->top = temp->next;
+    free(temp);
+    s->size--;
+
+    return data;
+}
+
+enum ad_op __ad_pop_op(__stack* s) {
+    if (__ad_is_stack_empty(s)) {
+        return -1;
+    }
+
+    __node* temp = s->top;
+    enum ad_op data = temp->op;
     s->top = temp->next;
     free(temp);
     s->size--;
