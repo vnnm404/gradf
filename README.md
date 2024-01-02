@@ -2,7 +2,7 @@
 
 Implements reverse mode automatic differentiation in C with a simple printf-like API.
 
-### TODOs
+## TODOs
 
 - Implement unions to support any C type
 - Extend to brackets
