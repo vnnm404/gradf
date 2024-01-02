@@ -1,6 +1,6 @@
 CC=gcc
-# CFLAGS=-Iinclude -fsanitize=address
-CFLAGS=-Iinclude
+CFLAGS=-Iinclude -fsanitize=address
+# CFLAGS=-Iinclude
 
 build/ad_core.o: src/ad_core.c include/ad.h
 	mkdir -p build
