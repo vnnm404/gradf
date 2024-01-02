@@ -1,4 +1,4 @@
-## `ad_float* gradf(const char *format, ...);`
+# `ad_float* gradf(const char *format, ...);`
 
 Implements reverse mode automatic differentiation in C with a simple printf-like API.
 
@@ -8,4 +8,5 @@ Implements reverse mode automatic differentiation in C with a simple printf-like
 - Extend to brackets
 - Extend to doubles and reals
 - Extend to vectors
+- Basic Neural Net implementing gradient descent
 - Support more format specifiers
